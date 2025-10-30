@@ -329,7 +329,7 @@ do_config_mtp() {
             echo -e "\n[\033[33mNotice\033[0m] Your system does not support the official version\n"
         fi
 
-        read -p "(默认版本: ${default_provider}):" input_provider
+        read -p "(Default version: ${default_provider}):" input_provider
         [ -z "${input_provider}" ] && input_provider=${default_provider}
         expr ${input_provider} + 1 &>/dev/null
         if [ $? -eq 0 ]; then
@@ -348,7 +348,7 @@ do_config_mtp() {
     while true; do
         default_port=443
         echo -e "Please enter a client connection port [1-65535]"
-        read -p "(默认端口: ${default_port}):" input_port
+        read -p "(Default port: ${default_port}):" input_port
         [ -z "${input_port}" ] && input_port=${default_port}
         expr ${input_port} + 1 &>/dev/null
         if [ $? -eq 0 ]; then
@@ -364,11 +364,11 @@ do_config_mtp() {
         echo -e "[\033[33mError\033[0m] Please re-enter a client connection port [1-65535]"
     done
 
-    # 管理端口
+    # Management Port
     while true; do
         default_manage=8888
         echo -e "Please enter a management port [1-65535]"
-        read -p "(默认端口: ${default_manage}):" input_manage_port
+        read -p "(Default port: ${default_manage}):" input_manage_port
         [ -z "${input_manage_port}" ] && input_manage_port=${default_manage}
         expr ${input_manage_port} + 1 &>/dev/null
         if [ $? -eq 0 ] && [ $input_manage_port -ne $input_port ]; then
@@ -388,7 +388,7 @@ do_config_mtp() {
     while true; do
         default_domain="azure.microsoft.com"
         echo -e "Please enter a domain name for TLS camouflage："
-        read -p "(默认域名: ${default_domain}):" input_domain
+        read -p "(Default domain: ${default_domain}):" input_domain
         [ -z "${input_domain}" ] && input_domain=${default_domain}
         http_code=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $input_domain)
         if [ $http_code -eq "200" ] || [ $http_code -eq "302" ] || [ $http_code -eq "301" ]; then
@@ -413,7 +413,7 @@ do_config_mtp() {
         echo -e "If you don’t have one, contact @MTProxybot to create your TAG, you may need the following information："
         echo -e "IP: ${public_ip}"
         echo -e "PORT: ${input_port}"
-        echo -e "SECRET(可以随便填): ${secret}"
+        echo -e "SECRET(You can fill in anything): ${secret}"
         read -p "(Leave empty to skip):" input_tag
         [ -z "${input_tag}" ] && input_tag=${default_tag}
         if [ -z "$input_tag" ] || [[ "$input_tag" =~ ^[A-Za-z0-9]{32}$ ]]; then
