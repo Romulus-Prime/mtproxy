@@ -116,7 +116,7 @@ function build_mtproto() {
             rm -rf 'MTProxy'
         fi
 
-        git clone https://github.com/ellermister/MTProxyC --depth=1 MTProxy
+        git clone https://github.com/Romulus-Prime/MTProxyC --depth=1 MTProxy
         cd MTProxy && make && cd objs/bin &&  chmod +x mtproto-proxy
 
         if [ ! -f "./mtproto-proxy" ]; then
@@ -149,7 +149,7 @@ function build_mtproto() {
         fi
 
         rm -rf build-mtg
-        git clone https://github.com/9seconds/mtg.git -b v1 build-mtg
+        git clone https://github.com/Romulus-Prime/mtg.git -b v1 build-mtg
         cd build-mtg && git reset --hard 9d67414db633dded5f11d549eb80617dc6abb2c3  && make static
 
         if [[ ! -f "./mtg" ]]; then
