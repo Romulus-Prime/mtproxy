@@ -102,7 +102,7 @@ function build_mtproto() {
 
     local platform=$(uname -m)
     if [[ -z "$1" ]]; then
-        echo "缺少参数"
+        echo "Missing parameter"
         exit 1
     fi
 
@@ -120,7 +120,7 @@ function build_mtproto() {
         cd MTProxy && make && cd objs/bin &&  chmod +x mtproto-proxy
 
         if [ ! -f "./mtproto-proxy" ]; then
-            echo "mtproto-proxy 编译失败"
+            echo "mtproto-proxy Compilation failed"
             exit 1
         fi
 
@@ -179,7 +179,7 @@ function get_mtg_provider() {
     elif [ $provider -eq 2 ]; then
         echo "mtg"
     else
-        echo "错误配置,请重新安装"
+        echo "Configuration error, please reinstall"
         exit 1
     fi
 }
@@ -275,12 +275,12 @@ do_kill_process() {
     source ./mtp_config
 
     if is_port_open $port; then
-        echo "检测到端口 $port 被占用, 准备杀死进程!"
+        echo "Detected port $port is occupied, preparing to kill the process!"
         kill_process_by_port $port
     fi
     
     if is_port_open $web_port; then
-        echo "检测到端口 $web_port 被占用, 准备杀死进程!"
+        echo "Detected port $web_port is occupied, preparing to kill the process!"
         kill_process_by_port $web_port
     fi
 }
@@ -291,7 +291,7 @@ do_check_system_datetime_and_update() {
     offset=$(abs $(( "$dateFromServer" - "$dateFromLocal")))
     tolerance=60
     if [ "$offset" -gt "$tolerance" ];then
-        echo "检测到系统时间不同步于世界时间, 即将更新"
+        echo "System time is not synchronized with world time, updating now"
         ntpdate -u time.google.com
     fi
 }
@@ -321,12 +321,12 @@ do_config_mtp() {
 
     while true; do
         default_provider=1
-        echo -e "请输入要安装的程序版本"
-        echo -e "1. Telegram 官方版本 (C语言, 存在一些问题, 只支持 x86_64)"
-        echo -e "2. 9seconds 第三方版本(兼容性强)"
+        echo -e "Please select which program version to install"
+        echo -e "1. Telegram official version (C language, some issues, only supports x86_64)"
+        echo -e "2. 9seconds third-party version (better compatibility)"
 
         if ! is_supported_official_version; then
-            echo -e "\n[\033[33m提醒\033[0m] 你的系统不支持官方版本\n"
+            echo -e "\n[\033[33mNotice\033[0m] Your system does not support the official version\n"
         fi
 
         read -p "(默认版本: ${default_provider}):" input_provider
@@ -342,12 +342,12 @@ do_config_mtp() {
                 break
             fi
         fi
-        echo -e "[\033[33m错误\033[0m] 请重新输入程序版本 [1-65535]\n"
+        echo -e "[\033[33mError\033[0m] Please re-enter the program version [1-65535]\n"
     done
 
     while true; do
         default_port=443
-        echo -e "请输入一个客户端连接端口 [1-65535]"
+        echo -e "Please enter a client connection port [1-65535]"
         read -p "(默认端口: ${default_port}):" input_port
         [ -z "${input_port}" ] && input_port=${default_port}
         expr ${input_port} + 1 &>/dev/null
@@ -361,13 +361,13 @@ do_config_mtp() {
                 break
             fi
         fi
-        echo -e "[\033[33m错误\033[0m] 请重新输入一个客户端连接端口 [1-65535]"
+        echo -e "[\033[33mError\033[0m] Please re-enter a client connection port [1-65535]"
     done
 
     # 管理端口
     while true; do
         default_manage=8888
-        echo -e "请输入一个管理端口 [1-65535]"
+        echo -e "Please enter a management port [1-65535]"
         read -p "(默认端口: ${default_manage}):" input_manage_port
         [ -z "${input_manage_port}" ] && input_manage_port=${default_manage}
         expr ${input_manage_port} + 1 &>/dev/null
@@ -381,25 +381,25 @@ do_config_mtp() {
                 break
             fi
         fi
-        echo -e "[\033[33m错误\033[0m] 请重新输入一个管理端口 [1-65535]"
+        echo -e "[\033[33mError\033[0m] Please re-enter a management port [1-65535]"
     done
 
     # domain
     while true; do
         default_domain="azure.microsoft.com"
-        echo -e "请输入一个需要伪装的域名："
+        echo -e "Please enter a domain name for TLS camouflage："
         read -p "(默认域名: ${default_domain}):" input_domain
         [ -z "${input_domain}" ] && input_domain=${default_domain}
         http_code=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $input_domain)
         if [ $http_code -eq "200" ] || [ $http_code -eq "302" ] || [ $http_code -eq "301" ]; then
             echo
             echo "---------------------------"
-            echo "伪装域名 = ${input_domain}"
+            echo "Camouflage domain = ${input_domain}"
             echo "---------------------------"
             echo
             break
         fi
-        echo -e "[\033[33m状态码：${http_code}错误\033[0m] 域名无法访问,请重新输入或更换域名!"
+        echo -e "[\033[33mStatus code：${http_code}Error\033[0m] Domain is unreachable, please try another one!"
     done
 
     # config info
@@ -409,12 +409,12 @@ do_config_mtp() {
     # proxy tag
     while true; do
         default_tag=""
-        echo -e "请输入你需要推广的TAG："
-        echo -e "若没有,请联系 @MTProxybot 进一步创建你的TAG, 可能需要信息如下："
+        echo -e "Please enter your proxy promotion TAG："
+        echo -e "If you don’t have one, contact @MTProxybot to create your TAG, you may need the following information："
         echo -e "IP: ${public_ip}"
         echo -e "PORT: ${input_port}"
         echo -e "SECRET(可以随便填): ${secret}"
-        read -p "(留空则跳过):" input_tag
+        read -p "(Leave empty to skip):" input_tag
         [ -z "${input_tag}" ] && input_tag=${default_tag}
         if [ -z "$input_tag" ] || [[ "$input_tag" =~ ^[A-Za-z0-9]{32}$ ]]; then
             echo
@@ -424,7 +424,7 @@ do_config_mtp() {
             echo
             break
         fi
-        echo -e "[\033[33m错误\033[0m] TAG格式不正确!"
+        echo -e "[\033[33mError\033[0m] Incorrect TAG format!"
     done
 
     cat >./mtp_config <<EOF
@@ -436,7 +436,7 @@ domain="${input_domain}"
 proxy_tag="${input_tag}"
 provider=${input_provider}
 EOF
-    echo -e "配置已经生成完毕!"
+    echo -e "Configuration generated successfully!"
 }
 
 function str_to_hex() {
@@ -458,14 +458,14 @@ info_mtp() {
         domain_hex=$(str_to_hex $domain)
 
         client_secret="ee${secret}${domain_hex}"
-        echo -e "TMProxy+TLS代理: \033[32m运行中\033[0m"
-        echo -e "服务器IP：\033[31m$public_ip\033[0m"
-        echo -e "服务器端口：\033[31m$port\033[0m"
+        echo -e "TMProxy+TLS代理: \033[32mRunning\033[0m"
+        echo -e "Server IP：\033[31m$public_ip\033[0m"
+        echo -e "Server Port：\033[31m$port\033[0m"
         echo -e "MTProxy Secret:  \033[31m$client_secret\033[0m"
-        echo -e "TG一键链接: https://t.me/proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
-        echo -e "TG一键链接: tg://proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
+        echo -e "TGOne-click link: https://t.me/proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
+        echo -e "TGOne-click link: tg://proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
     else
-        echo -e "TMProxy+TLS代理: \033[33m已停止\033[0m"
+        echo -e "TMProxy+TLS代理: \033[33mStopped\033[0m"
     fi
 }
 
@@ -480,7 +480,7 @@ function get_run_command(){
       public_ip=$(get_ip_public)
       
       # ./mtg simple-run -n 1.1.1.1 -t 30s -a 512kib 0.0.0.0:$port $client_secret >/dev/null 2>&1 &
-      [[ -f "./mtg" ]] || (echo -e "提醒：\033[33m MTProxy 代理程序不存在请重新安装! \033[0m" && exit 1)
+      [[ -f "./mtg" ]] || (echo -e "Notice：\033[33m MTProxy Proxy program not found, please reinstall! \033[0m" && exit 1)
       echo "./mtg run $client_secret $proxy_tag -b 0.0.0.0:$port --multiplex-per-connection 500 --prefer-ip=ipv6 -t $local_ip:$web_port" -4 "$public_ip:$port"
   else
       curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
@@ -497,7 +497,7 @@ run_mtp() {
     cd $WORKDIR
 
     if is_running_mtp; then
-        echo -e "提醒：\033[33mMTProxy已经运行，请勿重复运行!\033[0m"
+        echo -e "Notice：\033[33mMTProxyAlready running, please do not start again!\033[0m"
     else
         do_kill_process
         do_check_system_datetime_and_update
@@ -517,7 +517,7 @@ daemon_mtp() {
     cd $WORKDIR
 
     if is_running_mtp; then
-        echo -e "提醒：\033[33mMTProxy已经运行，请勿重复运行!\033[0m"
+        echo -e "Notice：\033[33mMTProxyAlready running, please do not start again!\033[0m"
     else
         do_kill_process
         do_check_system_datetime_and_update
@@ -531,7 +531,7 @@ daemon_mtp() {
                 info_mtp "ingore"
             } &
             $command >/dev/null 2>&1
-            echo "进程检测到被关闭,正在重启中!!!"
+            echo "Process detected closed, restarting...!!!"
             sleep 2
         done
     fi
@@ -540,8 +540,8 @@ daemon_mtp() {
 debug_mtp() {
     cd $WORKDIR
 
-    echo "当前正在运行调试模式："
-    echo -e "\t你随时可以通过 Ctrl+C 进行取消操作"
+    echo "Currently running in debug mode："
+    echo -e "\tYou can cancel anytime using Ctrl+C"
 
     do_kill_process
     do_check_system_datetime_and_update
@@ -557,7 +557,7 @@ stop_mtp() {
     kill -9 $pid
 
     if is_pid_exists $pid; then
-        echo "停止任务失败"
+        echo "Failed to stop the task"
     fi
 }
 
@@ -566,8 +566,8 @@ reinstall_mtp() {
     if [ -f "./mtp_config" ]; then
         while true; do
             default_keep_config="y"
-            echo -e "是否保留配置文件? "
-            read -p "y: 保留 , n: 不保留 (默认: ${default_keep_config}):" input_keep_config
+            echo -e "Do you want to keep the configuration file?? "
+            read -p "y: Keep , n: 不Keep (默认: ${default_keep_config}):" input_keep_config
             [ -z "${input_keep_config}" ] && input_keep_config=${default_keep_config}
 
             if [[ "$input_keep_config" == "y" ]] || [[ "$input_keep_config" == "n" ]]; then
@@ -576,7 +576,7 @@ reinstall_mtp() {
                 fi
                 break
             fi
-            echo -e "[\033[33m错误\033[0m] 输入错误， 请输入 y / n"
+            echo -e "[\033[33mError\033[0m] 输入Error， 请输入 y / n"
         done
     fi
 
@@ -592,16 +592,16 @@ reinstall_mtp() {
 param=$1
 
 if [[ "start" == $param ]]; then
-    echo "即将：启动脚本"
+    echo "About to start the script"
     run_mtp
 elif [[ "daemon" == $param ]]; then
-    echo "即将：启动脚本(守护进程)"
+    echo "About to start the script(守护进程)"
     daemon_mtp
 elif [[ "stop" == $param ]]; then
-    echo "即将：停止脚本"
+    echo "About to stop the script"
     stop_mtp
 elif [[ "debug" == $param ]]; then
-    echo "即将：调试运行"
+    echo "即将：Run in debug mode"
     debug_mtp
 elif [[ "restart" == $param ]]; then
     stop_mtp
@@ -618,9 +618,9 @@ elif [[ "build" == $param ]]; then
      build_mtproto 2
 else
     if ! is_installed; then
-        echo "MTProxyTLS一键安装运行绿色脚本"
+        echo "MTProxyTLS one-click installation script"
         print_line
-        echo -e "检测到您的配置文件不存在, 为您指引生成!" && print_line
+        echo -e "Configuration file not found, guiding you to create one!" && print_line
 
         do_install_basic_dep
         do_config_mtp
@@ -628,18 +628,18 @@ else
         run_mtp
     else
         [ ! -f "$WORKDIR/mtp_config" ] && do_config_mtp
-        echo "MTProxyTLS一键安装运行绿色脚本"
+        echo "MTProxyTLS one-click installation script"
         print_line
         info_mtp
         print_line
-        echo -e "脚本源码：https://github.com/ellermister/mtproxy"
-        echo -e "配置文件: $WORKDIR/mtp_config"
-        echo -e "卸载方式：直接删除当前目录下文件即可"
-        echo "使用方式:"
-        echo -e "\t启动服务\t bash $0 start"
-        echo -e "\t调试运行\t bash $0 debug"
-        echo -e "\t停止服务\t bash $0 stop"
-        echo -e "\t重启服务\t bash $0 restart"
-        echo -e "\t重新安装代理程序 bash $0 reinstall"
+        echo -e "Script source：https://github.com/ellermister/mtproxy"
+        echo -e "Configuration file: $WORKDIR/mtp_config"
+        echo -e "Uninstall method: simply delete all files in the current directory"
+        echo "Usage:"
+        echo -e "\tStart service\t bash $0 start"
+        echo -e "\tRun in debug mode\t bash $0 debug"
+        echo -e "\tStop service\t bash $0 stop"
+        echo -e "\tRestart service\t bash $0 restart"
+        echo -e "\tReinstall proxy program bash $0 reinstall"
     fi
 fi
